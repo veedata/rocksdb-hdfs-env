@@ -16,10 +16,11 @@ namespace ROCKSDB_NAMESPACE {
 extern "C" FactoryFunc<Env> hdfs_reg;
 
 FactoryFunc<Env> hdfs_reg =
-    ObjectLibrary::Default()->Register<Env>(
+    ObjectLibrary::Default()->AddFactory<Env>(
         "hdfs://.*",
-        [](const std::string& fsname, std::unique_ptr<Env>* env,
-           std::string* /* errmsg */) {
+        [](const std::string &fsname, std::unique_ptr<Env> *env,
+           std::string * /* errmsg */)
+        {
           *env = NewHdfsEnv(fsname);
           return env->get();
         });
