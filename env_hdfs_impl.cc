@@ -4,6 +4,9 @@
 //  (found in the LICENSE.Apache file in the root directory).
 //
 
+#include "logging/logging.h"
+#include "rocksdb/status.h"
+#include "util/string_util.h"
 #include "env_hdfs_impl.h"
 
 #include <rocksdb/env.h>
@@ -17,9 +20,6 @@
 #include <algorithm>
 #include <iostream>
 #include <sstream>
-#include "logging/logging.h"
-#include "rocksdb/status.h"
-#include "util/string_util.h"
 
 #define HDFS_EXISTS 0
 #define HDFS_DOESNT_EXIST -1
@@ -459,9 +459,12 @@ Status HdfsEnv::NewDirectory(const std::string& name,
     default:  // fail if the directory doesn't exist
       ROCKS_LOG_FATAL(mylog, "NewDirectory hdfsExists call failed");
       throw HdfsFatalException("hdfsExists call failed with error " +
-                               ToString(value) + " on path " + name +
+                               std::to_string(value) + " on path " + name +
                                ".\n");
-  }
+      return Status::IOError("hdfsExists call failed with error " +
+                             std::to_string(value) + " on path " + name +
+                             ".\n");
+    }
 }
 
 Status HdfsEnv::FileExists(const std::string& fname) {
@@ -474,7 +477,7 @@ Status HdfsEnv::FileExists(const std::string& fname) {
     default:  // anything else should be an error
       ROCKS_LOG_FATAL(mylog, "FileExists hdfsExists call failed");
       return Status::IOError("hdfsExists call failed with error " +
-                             ToString(value) + " on path " + fname + ".\n");
+                             std::to_string(value) + " on path " + fname + ".\n");
   }
 }
 
@@ -510,7 +513,7 @@ Status HdfsEnv::GetChildren(const std::string& path,
   default:          // anything else should be an error
     ROCKS_LOG_FATAL(mylog, "GetChildren hdfsExists call failed");
     throw HdfsFatalException("hdfsExists call failed with error " +
-                             ToString(value) + ".\n");
+                             std::to_string(value) + ".\n");
   }
   return Status::OK();
 }
@@ -540,8 +543,10 @@ Status HdfsEnv::CreateDirIfMissing(const std::string& name) {
     default:  // anything else should be an error
       ROCKS_LOG_FATAL(mylog, "CreateDirIfMissing hdfsExists call failed");
       throw HdfsFatalException("hdfsExists call failed with error " +
-                               ToString(value) + ".\n");
-  }
+                               std::to_string(value) + ".\n");
+      return Status::IOError("hdfsExists call failed with error " +
+                             std::to_string(value) + ".\n");
+    }
 };
 
 Status HdfsEnv::DeleteDir(const std::string& name) {
