@@ -21,7 +21,8 @@ FactoryFunc<Env> hdfs_reg =
         [](const std::string &fsname, std::unique_ptr<Env> *env,
            std::string * /* errmsg */)
         {
-          *env = NewHdfsEnv(fsname);
+          auto *raw_env_ptr = NewHdfsEnv(fsname).release();
+          env->reset(raw_env_ptr);
           return env->get();
         });
 
