@@ -10,6 +10,7 @@
 #include "env_hdfs.h"
 
 #include <rocksdb/env.h>
+#include <sys/time.h>
 
 #include <stdio.h>
 #include <time.h>
